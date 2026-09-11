@@ -1,0 +1,11 @@
+# Evaluation Configuration for agents-cli eval
+# ※ dataset_path は ③ で Antigravity が自動生成するファイルを指しています
+dataset_path: "tests/eval/datasets/agent_eval.json"
+target_agent: "agent:root_agent"
+
+metrics:
+  - name: "llm_criteria"
+    weight: 1.0
+    judge_model: "gemini-2.5-flash"
+
+output_dir: "artifacts/grade_results"

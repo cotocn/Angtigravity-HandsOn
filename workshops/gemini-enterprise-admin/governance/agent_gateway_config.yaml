@@ -1,0 +1,23 @@
+# Agent Gateway Configuration
+# 集中アクセス制御・レート制限・ルーティング設定
+
+gateway:
+  name: "enterprise-agent-gateway"
+  description: "Gemini Enterprise 向け集中アクセスコントロール ＆ 流量制限 Gateway"
+
+  routing:
+    - path: "/v1/agents/advisory"
+      target_agent: "enterprise_advisory_agent"
+      auth:
+        type: "IAM_AUTHENTICATION"
+        required_role: "roles/discoveryengine.user"
+
+  traffic_control:
+    rate_limiting:
+      max_requests_per_minute_per_user: 20
+      max_concurrent_requests_per_user: 3
+    timeout_seconds: 60
+
+  observability:
+    cloud_audit_logging: true
+    prompt_response_sampling_rate: 1.0 # 100% 監査ログに記録

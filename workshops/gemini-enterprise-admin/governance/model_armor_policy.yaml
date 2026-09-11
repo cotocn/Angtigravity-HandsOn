@@ -1,0 +1,22 @@
+# Model Armor Security Policy Configuration
+# Gemini Enterprise / Vertex AI Model Armor 用のセキュリティテンプレート
+
+name: "enterprise-agent-defense-policy"
+description: "プロンプトインジェクション・Jailbreak・機密情報(PII)を遮断するガバナンスポリシー"
+
+filters:
+  - name: "prompt_injection_filter"
+    type: "PROMPT_INJECTION_AND_JAILBREAK"
+    enforcement: "BLOCK"
+    threshold: "HIGH_CONFIDENCE"
+    description: "システムプロンプトの改ざん・無視指示（Ignore previous instructions 等）を検知して遮断"
+
+  - name: "pii_sanitization_filter"
+    type: "PII_DETECTION"
+    enforcement: "MASK"
+    entities:
+      - "CREDIT_CARD_NUMBER"
+      - "PHONE_NUMBER"
+      - "EMAIL_ADDRESS"
+      - "NATIONAL_ID"
+    description: "プロンプトおよびレスポンス内の個人情報・機密情報を自動マスキング"
