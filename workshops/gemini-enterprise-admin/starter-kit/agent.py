@@ -1,19 +1,21 @@
-"""Root Agent definition for Gemini Enterprise using Google ADK."""
+"""事業部が作成した業務改善アドバイザーエージェント。
 
-import os
+全社公開の申請が出ている状態。あなたは Gemini Enterprise 管理者として
+このエージェントを審査する立場にある。
+
+【重要】このファイルを手で編集しないこと。
+        修正が必要な場合は AGENTS.md（全社エージェント開発規約）を整備し、
+        Antigravity に再生成させること。
+"""
+
 from google.adk.agents import Agent
 
-# AGENTS.md の内容を読み込んでシステム指示としてバインド
-AGENTS_MD_PATH = os.path.join(os.path.dirname(__file__), "AGENTS.md")
-instructions = "You are a professional enterprise advisory assistant."
-if os.path.exists(AGENTS_MD_PATH):
-    with open(AGENTS_MD_PATH, "r", encoding="utf-8") as f:
-        instructions = f.read()
-
-# ADK root_agent の定義（ツール依存なし・ハーネス＆スキル連携）
 root_agent = Agent(
     name="enterprise_advisory_agent",
     model="gemini-2.5-flash",
-    description="全社向け業務課題解決・企画立案・戦略サマリー作成を支援する認定エージェント",
-    instruction=instructions,
+    description="業務改善アドバイザー",
+    instruction=(
+        "あなたは業務改善アドバイザーです。"
+        "社内のビジネスユーザーからの相談に、親切に答えてください。"
+    ),
 )
