@@ -33,7 +33,55 @@
 
 ---
 
-## 3. ハンズオンの流れ（全 6 ステップ・80分）
+## 3. 事前準備：演習資材のセットアップ（Git または ZIP）
+
+ハンズオンを開始する前に、演習用資材（`starter-kit`）を手元の PC に準備します。
+社内セキュリティポリシーやネットワーク環境に応じて、**【方法 A】** または **【方法 B】** のいずれかで準備してください。
+
+### 【方法 A】GitHub からクローンする場合（推奨）
+端末（ターミナル）を開き、以下を実行して資材を取得・展開します。
+
+```bash
+# 1. ワークショップ資材のクローン
+git clone https://github.com/cotocn/Angtigravity-HandsOn.git ~/Angtigravity-HandsOn
+
+# 2. ハンズオン専用の作業ディレクトリを作成してコピー
+mkdir -p ~/ge-workshop
+cp -r ~/Angtigravity-HandsOn/workshops/gemini-enterprise-admin/starter-kit/* ~/ge-workshop/
+cp ~/Angtigravity-HandsOn/workshops/gemini-enterprise-admin/starter-kit/.env* ~/ge-workshop/ 2>/dev/null || true
+
+# 3. 作業ディレクトリへ移動し、依存関係を同期
+cd ~/ge-workshop
+uv sync
+```
+
+---
+
+### 【方法 B】ZIP アーカイブをダウンロードして解凍する場合（Git アクセス不可時）
+社内ネットワーク制限等で GitHub への `git clone` が禁止されている場合は、配布された ZIP ファイルを使用します。
+
+1. 講師から配布された演習用 ZIP（`starter-kit.zip`）をダウンロードします。
+2. 任意の場所（例: `~/ge-workshop`）に解凍します。
+   ```bash
+   # 解凍例（ターミナルで実行する場合）
+   mkdir -p ~/ge-workshop
+   unzip starter-kit.zip -d ~/ge-workshop
+   
+   # 作業ディレクトリへ移動し、依存関係を同期
+   cd ~/ge-workshop
+   uv sync
+   ```
+
+---
+
+### Antigravity でプロジェクトを開く
+1. **Antigravity 2.0** を起動します。
+2. メニューから **「Open Folder（フォルダを開く）」** を選択し、上記で準備した `~/ge-workshop` を開きます。
+3. エクスプローラーに `app/agent.py` や `AGENTS.md` が表示されていることを確認したら、ハンズオン開始です！
+
+---
+
+## 4. ハンズオンの流れ（全 6 ステップ・80分）
 
 ```
 [初期状態] 事業部から届いた欠陥エージェント（APIキー直書き、指示文が1行）
@@ -59,7 +107,7 @@
 
 ---
 
-## 4. 各ステップの手順
+## 5. 各ステップの手順
 
 ### ステップ ①：全社エージェント開発規約を定める（10分）
 エージェントに対する全社統一の「行動指針」を定義します。
@@ -210,7 +258,7 @@
 
 ---
 
-## 5. まとめ：持ち帰っていただく 3 つの原則
+## 6. まとめ：持ち帰っていただく 3 つの原則
 
 1. **「AGENTS.md（規約）」だけではエージェントを縛れない**（お願いに過ぎない）
 2. **絶対に守らせたい境界線は「Hooks（物理遮断）」で止める**
