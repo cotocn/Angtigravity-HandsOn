@@ -67,6 +67,54 @@ gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
   --role="roles/aiplatform.user"
 ```
 
+> [!NOTE]
+> 本ワークショップのサンプルエージェントは **外部システムに接続しません**。
+> FAQ 検索もチケット照会もコード内のダミーデータを返すだけなので、
+> BigQuery などデータストア側の権限は一切不要です。
+
+
+### B-3. Gemini モデルの疎通確認【必ず実施】
+
+前日までに、受講者アカウント（もしくは同等の権限）で以下が通ることを確認してください。
+
+```bash
+gcloud ai endpoints list --region=us-east1 --project=YOUR_PROJECT_ID >/dev/null \
+  && echo "aiplatform への疎通 OK"
+```
+
+> モデルは `gemini-3.8-flash` を使用します。対象プロジェクト／リージョンで
+> 当該モデルが利用可能かを、講師が事前に 1 度呼び出して確認しておいてください。
+
+### B-4. デプロイ時の環境変数の受け渡し
+
+ハンズオン④で、受講者はソースコードに直書きされた `ITSM_API_KEY` を
+**環境変数から読み込む形へ修正**します。デプロイ後もエージェントが同じ値を
+参照できるよう、環境変数を渡す手段を確認しておいてください。
+
+```bash
+# .env に定義した値をデプロイ時に引き渡す
+agents-cli deploy --update-env-vars "ITSM_API_KEY=${ITSM_API_KEY}"
+```
+
+> [!NOTE]
+> 本ワークショップの `ITSM_API_KEY` は**ダミー値**です。実在のシステムには接続しません。
+> 「直書きをやめて外から注入する」という**型を体験すること**が目的です。
+
+> [!TIP]
+> `agents-cli deploy` は Secret Manager からの注入にも対応しています。
+> 本番ではこちらを使ってください。
+>
+> ```bash
+> agents-cli deploy --secrets "ITSM_API_KEY=itsm-api-key:latest"
+> ```
+>
+> この場合、エージェント実行サービスアカウントに
+> `roles/secretmanager.secretAccessor` の付与が必要です。
+> 第3部のガバナンス講義でこの流れを解説します。
+
+
+
+
 ---
 
 ## C. Gemini Enterprise 側の準備（管理者が実施）

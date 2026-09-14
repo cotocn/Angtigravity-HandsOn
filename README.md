@@ -7,7 +7,7 @@ Google Antigravity を活用したエージェント開発ハンズオンの教�
 
 | ディレクトリ | 対象 | 所要時間 | 概要 |
 | --- | --- | --- | --- |
-| [`workshops/gemini-enterprise-admin`](workshops/gemini-enterprise-admin/) | Gemini Enterprise 管理者 | 3 時間 | 欠陥入りベースエージェントに対して Eval を自動生成し、赤 → AGENTS.md / SKILL.md 修正 → 緑 → Agent Runtime デプロイ → Gemini Enterprise 登録までを体験する |
+| [`workshops/gemini-enterprise-admin`](workshops/gemini-enterprise-admin/) | Gemini Enterprise 管理者 | 3 時間 | ハーネス（AGENTS.md / Skill / Hook）によるエージェント制御、Stop フックによる秘密情報直書きの阻止と自己修正、受入評価（Eval）、Agent Runtime デプロイ、Gemini Enterprise 登録までを体験する |
 | [`workshops/antigravity-cloud-workstations`](workshops/antigravity-cloud-workstations/) | 社内エンジニア / 環境構築担当 | 1 時間程度 | Cloud Workstations 上に Antigravity 環境を構築する手順 |
 
 ## ディレクトリ構成

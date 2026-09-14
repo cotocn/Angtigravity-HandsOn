@@ -22,34 +22,38 @@ Gemini Enterprise 管理者を対象にした 3 時間のワークショップ�
 ## 学習の流れ
 
 ```
-[配布] 事業部から申請された低品質なエージェント（instruction が 1 文だけ）
+[配布] 事業部から申請された低品質なエージェント（API キー直書き、instruction が 1 文だけ）
    │
-   ① AGENTS.md を「全社エージェント開発規約」に書き換える     ← 受講者が書く
-   ② /masakari スキルを作成する                                ← 受講者が書く
-   ③ Antigravity に agent.py を再生成させる                    ← Antigravity が書く
-       └─→ --no-wait で配備を先行起動（＝技術的配備）
-   ④ agents-cli eval run → 受入判定シートに記入 → 公開可否を判断 ★山場
-   ⑤ 配備の完了確認
-   ⑥ Gemini Enterprise に登録 ＝ 全社公開
+   ① AGENTS.md を「全社エージェント開発規約」に書き換える       ← 受講者が書く
+   ② /masakari スキル（辛口レビュー）を作成する                  ← 受講者が書く
+   ③ hooks.json を作成し、ガードレールを設定する                  ← 受講者が書く
+       ├─→ PreToolUse: 危険コマンド（rm -rf 等）を物理遮断
+       └─→ Stop: ソースコード内のシークレット直書きを検知し完了を拒否
+   ④ エージェントを見直させる（★本日の山場）                      ← Antigravity が修正
+       ├─→ エージェントが完了しようとする → Stop フックが発火して完了拒否
+       ├─→ ガードレールの指摘（環境変数から読め）を受け、エージェントが自己修正
+       └─→ --no-wait で Agent Runtime への配備を先行起動（＝技術的配備）
+   ⑤ agents-cli eval run で受入評価 → 公開可否を判断（承認ゲート）
+   ⑥ 配備確認（deploy --status）→ Gemini Enterprise に登録 ＝ 全社公開
 ```
 
 > [!TIP]
-> **デプロイ（技術的配備）と公開（承認を伴う経営判断）は別物です。**
-> ③ の直後に配備を始め、④ の承認が下りてから ⑥ で公開します。
+> **デプロイ（技術的配備）と公開（承認を伴う管理判断）は別物です。**
+> ④ の直後に配備を始め、⑤ の評価結果を確認してから ⑥ で全社公開します。
 
-> [!NOTE]
-> Eval は「赤 → 緑の修正ループ」ではなく **「公開してよいかを判断するための受入検査」** です。
-> LLM の判定は確率的なため、特定のテストが必ず落ちる前提の設計は当日の運任せになります。
-> 本設計では**スコアが何点でも演習が成立**します。判断すること自体が学習目標です。
+> [!IMPORTANT]
+> **お願いと、強制は違います。**
+> 規約（AGENTS.md）やレビュー（Skill）だけでは、エージェントが規約を無視するのを防げません。
+> 物理的に「終了させない」Hook の門番が効く瞬間を体感することが本ワークショップの最大の学びです。
 
 ## タイムテーブル（概要）
 
 | 時間 | パート | 内容 |
 | --- | --- | --- |
-| 70 分 | 第 1 部 座学 | エージェントの進化 / ハーネス工学（AGENTS.md・SKILL.md・Hooks・MCP）/ SDD |
+| 70 分 | 第 1 部 座学 | エージェントの進化 / ハーネス工学（AGENTS.md・SKILL.md・Hooks・MCP）/ ガバナンス基礎 |
 | 10 分 | 休憩 | 環境の最終疎通確認 |
 | 80 分 | 第 2 部 ハンズオン | ①〜⑥ |
-| 20 分 | 第 3 部 | ガバナンス（Model Armor / Agent Gateway / IAM）・FinOps・ラップアップ |
+| 20 分 | 第 3 部 | 高度ガバナンス（Model Armor / Agent Gateway / IAM）・FinOps・ラップアップ |
 
 ## ディレクトリ構成
 
@@ -57,7 +61,7 @@ Gemini Enterprise 管理者を対象にした 3 時間のワークショップ�
 | --- | --- | --- |
 | [`docs/workshop-guide.md`](docs/workshop-guide.md) | 講師 | ワークショップ設計書（本体） |
 | [`docs/prerequisites.md`](docs/prerequisites.md) | 受講者 | 事前準備チェックリスト（PC 環境 / API / IAM / GE App） |
-| [`starter-kit/`](starter-kit/) | 受講者 | 配布用一式（緩い `AGENTS.md` ＋ 低品質な `agent.py`） |
+| [`starter-kit/`](starter-kit/) | 受講者 | 配布用一式（API キー直書きエージェント、未設定の hooks.json） |
 | [`answers/`](answers/) | 講師のみ | 模範解答。脱落者救済用 |
 | [`governance/`](governance/) | 講師 | Model Armor / Agent Gateway の設定サンプル（第 3 部で解説） |
 
@@ -65,11 +69,13 @@ Gemini Enterprise 管理者を対象にした 3 時間のワークショップ�
 
 | ファイル | 層 | 状態 |
 | --- | --- | --- |
-| `AGENTS.md` | 開発時 | ⚠️ 事業部が書いた 6 行の雑な方針。① で書き換える |
-| `agent.py` | 実行時 | ⚠️ `instruction` が 1 文だけ。**手で編集しない** |
-| `skills/publish-gemini-enterprise/SKILL.md` | 開発時 | ✅ 講師提供（デプロイ・登録の自動化） |
-| `tests/eval/eval_config.yaml` | — | ✅ 安全性 2 種・業務品質 2 種のメトリクス定義 |
-| `tests/eval/ACCEPTANCE_CRITERIA.md` | — | ✅ **④ の成果物**となる受入判定シート |
+| `AGENTS.md` | 開発時 | ⚠️ 事業部が書いた緩い 3 行。① で全社規約に書き換える |
+| `app/agent.py` | 実行時 | ⚠️ ITSM_API_KEY 直書き、instruction が 1 文。**手で編集せず、エージェントに直させる** |
+| `.agents/scripts/validate_tool_call.py` | 開発時 | ✅ 危険コマンド遮断スクリプト（講師提供） |
+| `.agents/scripts/scan_secrets.py` | 開発時 | ✅ シークレット直書き検知スクリプト（講師提供） |
+| `.agents/hooks.json` | 開発時 | ❌ 意図的に未作成。③ で受講者が作成する |
+| `tests/eval/datasets/helpdesk-eval.json` | — | ✅ 社内 IT ヘルプデスク用の評価ケース（FAQ 検索、チケット照会、範囲外対応） |
+| `tests/eval/eval_config.yaml` | — | ✅ LLM-as-judge メトリクス設定 |
 
 > [!WARNING]
 > `answers/` を受講者に事前共有しないでください。演習が成立しなくなります。
@@ -84,17 +90,12 @@ Gemini Enterprise 管理者を対象にした 3 時間のワークショップ�
 - IAM ロールの付与
 - Gemini Enterprise アプリの事前作成
 
-> [!CAUTION]
-> **講師は開催前に必ず事前ドライランを実施してください**（設計書 7-3）。
-> `agents-cli eval run` がスキーマエラーなく完走することの確認が最優先です。
-
 ## 受講者の始め方
 
 ```bash
 cp -r workshops/gemini-enterprise-admin/starter-kit ~/ge-workshop
 cd ~/ge-workshop
+uv sync
 
-agents-cli eval run \
-  --dataset tests/eval/datasets/agent_eval.json \
-  --config  tests/eval/eval_config.yaml
+# Antigravity でワークスペースを開いてハンズオン開始
 ```
