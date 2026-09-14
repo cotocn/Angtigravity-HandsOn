@@ -33,50 +33,42 @@
 
 ---
 
-## 3. 事前準備：演習資材のセットアップ（Git または ZIP）
+## 3. 演習資材の準備（Git または ZIP）
 
 ハンズオンを開始する前に、演習用資材（`starter-kit`）を手元の PC に準備します。
 社内セキュリティポリシーやネットワーク環境に応じて、**【方法 A】** または **【方法 B】** のいずれかで準備してください。
 
 ### 【方法 A】GitHub からクローンする場合（推奨）
-端末（ターミナル）を開き、以下を実行して資材を取得・展開します。
+ターミナルを開き、以下を実行します。
 
 ```bash
 # 1. ワークショップ資材のクローン
-git clone https://github.com/cotocn/Angtigravity-HandsOn.git ~/Angtigravity-HandsOn
+git clone https://github.com/cotocn/Angtigravity-HandsOn.git
 
-# 2. ハンズオン専用の作業ディレクトリを作成してコピー
-mkdir -p ~/ge-workshop
-cp -r ~/Angtigravity-HandsOn/workshops/gemini-enterprise-admin/starter-kit/* ~/ge-workshop/
-cp ~/Angtigravity-HandsOn/workshops/gemini-enterprise-admin/starter-kit/.env* ~/ge-workshop/ 2>/dev/null || true
-
-# 3. 作業ディレクトリへ移動し、依存関係を同期
-cd ~/ge-workshop
+# 2. starter-kit フォルダへ移動し、初期セットアップ
+cd Angtigravity-HandsOn/workshops/gemini-enterprise-admin/starter-kit
 uv sync
 ```
 
 ---
 
 ### 【方法 B】ZIP アーカイブをダウンロードして解凍する場合（Git アクセス不可時）
-社内ネットワーク制限等で GitHub への `git clone` が禁止されている場合は、配布された ZIP ファイルを使用します。
+社内ネットワーク制限等で GitHub へのアクセスが禁止されている場合は、配布された ZIP ファイルを使用します。
 
-1. 講師から配布された演習用 ZIP（`starter-kit.zip`）をダウンロードします。
-2. 任意の場所（例: `~/ge-workshop`）に解凍します。
-   ```bash
-   # 解凍例（ターミナルで実行する場合）
-   mkdir -p ~/ge-workshop
-   unzip starter-kit.zip -d ~/ge-workshop
-   
-   # 作業ディレクトリへ移動し、依存関係を同期
-   cd ~/ge-workshop
-   uv sync
-   ```
+```bash
+# 1. 配布された starter-kit.zip を解凍
+unzip starter-kit.zip
+
+# 2. starter-kit フォルダへ移動し、初期セットアップ
+cd starter-kit
+uv sync
+```
 
 ---
 
-### Antigravity でプロジェクトを開く
+### Antigravity で開く
 1. **Antigravity 2.0** を起動します。
-2. メニューから **「Open Folder（フォルダを開く）」** を選択し、上記で準備した `~/ge-workshop` を開きます。
+2. メニューの **「Open Folder（フォルダを開く）」** から、上記の `starter-kit` フォルダを選択して開きます。
 3. エクスプローラーに `app/agent.py` や `AGENTS.md` が表示されていることを確認したら、ハンズオン開始です！
 
 ---
@@ -112,7 +104,7 @@ uv sync
 ### ステップ ①：全社エージェント開発規約を定める（10分）
 エージェントに対する全社統一の「行動指針」を定義します。
 
-1. Antigravity でプロジェクトを開き、`AGENTS.md` を確認します。末尾に事業部が書いた緩い指示が残っています。
+1. Antigravity で `starter-kit` を開き、`AGENTS.md` を確認します。末尾に事業部が書いた緩い指示が残っています。
 2. チャット欄で Antigravity に以下を指示して、全社規約へ書き換えます。
 
 > **入力プロンプト:**
