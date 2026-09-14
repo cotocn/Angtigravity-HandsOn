@@ -153,7 +153,7 @@ uv sync
 >         "hooks": [
 >           {
 >             "type": "command",
->             "command": "python3 scripts/validate_tool_call.py",
+>             "command": "python3 .agents/scripts/validate_tool_call.py",
 >             "timeout": 10
 >           }
 >         ]
@@ -162,7 +162,7 @@ uv sync
 >     "Stop": [
 >       {
 >         "type": "command",
->         "command": "python3 scripts/scan_secrets.py",
+>         "command": "python3 .agents/scripts/scan_secrets.py",
 >         "timeout": 10
 >       }
 >     ]
