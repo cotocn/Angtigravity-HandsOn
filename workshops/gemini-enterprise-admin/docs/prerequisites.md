@@ -1,13 +1,14 @@
 # 【必読】ワークショップ事前準備チェックリスト
 
 > **開催前日までに必ず完了させ、講師までご報告ください。**
+> 未完了の場合、当日のハンズオン（受入評価やデプロイ）で進行できなくなります。
 
 ---
 
 ## A. 受講者 PC 環境（各自で実施）
 
 ### A-1. Antigravity 2.0 のインストール
-アプリを起動し、チャットが応答することを確認してください。
+アプリを起動し、チャットが正常に応答することを確認してください。
 
 ### A-2. Google Cloud CLI の認証
 ```bash
@@ -21,6 +22,10 @@ gcloud config list
 # macOS / Linux
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
+# PATH の永続化（★必ず実行してください）
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+
 # 確認
 uv --version
 ```
@@ -28,17 +33,8 @@ uv --version
 ### A-4. agents-cli のインストール【最重要】
 ```bash
 uv tool install google-agents-cli
-```
 
-> [!CAUTION]
-> **「command not found: agents-cli」と出る場合**:
-> ターミナルで以下を実行して PATH を通してください（またはシェルの設定ファイル `~/.bashrc` や `~/.zshrc` に追記してターミナルを再起動してください）。
-> ```bash
-> export PATH="$HOME/.local/bin:$PATH"
-> ```
-
-```bash
-# 確認コマンド（★このコマンドが通ることを必ず報告してください）
+# 確認コマンド（★このコマンドが通ることを必ず確認してください）
 agents-cli --version
 ```
 
@@ -70,6 +66,7 @@ gcloud builds list --project="$PROJECT_ID" --limit=1 >/dev/null 2>&1 \
 > [!IMPORTANT]
 > **すべて ✅ OK と表示された画面（または実行ログ）を、前日 17:00 までに講師へご報告ください。**
 
+---
 
 ## B. GCP プロジェクト側の準備（情シス・管理者が実施）
 
@@ -83,7 +80,7 @@ gcloud services enable \
   --project=YOUR_PROJECT_ID
 ```
 
-> API 有効化の伝播には時間がかかる場合があります。**当日ではなく前日までに**実施してください。
+> API 有効化の反映には時間がかかる場合があります。**当日ではなく前日までに**実施してください。
 
 ### B-2. 受講者アカウントに付与する IAM ロール
 
@@ -107,7 +104,6 @@ gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
 > FAQ 検索もチケット照会もコード内のダミーデータを返すだけなので、
 > BigQuery などデータストア側の権限は一切不要です。
 
-
 ### B-3. Gemini モデルの疎通確認【必ず実施】
 
 前日までに、受講者アカウント（もしくは同等の権限）で以下が通ることを確認してください。
@@ -116,39 +112,6 @@ gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
 gcloud ai endpoints list --region=us-east1 --project=YOUR_PROJECT_ID >/dev/null \
   && echo "aiplatform への疎通 OK"
 ```
-
-> モデルは `gemini-3.8-flash` を使用します。対象プロジェクト／リージョンで
-> 当該モデルが利用可能かを、講師が事前に 1 度呼び出して確認しておいてください。
-
-### B-4. デプロイ時の環境変数の受け渡し
-
-ハンズオン④で、受講者はソースコードに直書きされた `ITSM_API_KEY` を
-**環境変数から読み込む形へ修正**します。デプロイ後もエージェントが同じ値を
-参照できるよう、環境変数を渡す手段を確認しておいてください。
-
-```bash
-# .env に定義した値をデプロイ時に引き渡す
-agents-cli deploy --update-env-vars "ITSM_API_KEY=${ITSM_API_KEY}"
-```
-
-> [!NOTE]
-> 本ワークショップの `ITSM_API_KEY` は**ダミー値**です。実在のシステムには接続しません。
-> 「直書きをやめて外から注入する」という**型を体験すること**が目的です。
-
-> [!TIP]
-> `agents-cli deploy` は Secret Manager からの注入にも対応しています。
-> 本番ではこちらを使ってください。
->
-> ```bash
-> agents-cli deploy --secrets "ITSM_API_KEY=itsm-api-key:latest"
-> ```
->
-> この場合、エージェント実行サービスアカウントに
-> `roles/secretmanager.secretAccessor` の付与が必要です。
-> 第3部のガバナンス講義でこの流れを解説します。
-
-
-
 
 ---
 
