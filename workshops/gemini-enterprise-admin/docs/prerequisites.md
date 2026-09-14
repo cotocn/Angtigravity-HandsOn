@@ -29,12 +29,48 @@ uv --version
 ### A-4. agents-cli のインストール【最重要】
 ```bash
 uv tool install google-agents-cli
+```
 
-# 確認（★このコマンドが通ることを必ず報告してください）
+> [!CAUTION]
+> **「command not found: agents-cli」と出る場合**:
+> ターミナルで以下を実行して PATH を通してください（またはシェルの設定ファイル `~/.bashrc` や `~/.zshrc` に追記してターミナルを再起動してください）。
+> ```bash
+> export PATH="$HOME/.local/bin:$PATH"
+> ```
+
+```bash
+# 確認コマンド（★このコマンドが通ることを必ず報告してください）
 agents-cli --version
 ```
 
 ---
+
+### A-5. 事前疎通テスト（ワンライナー実行）【必ず実施】
+
+各自の PC 環境および GCP 権限が正しく設定されているかを、以下のコマンドをターミナルに貼り付けて一括検証してください。
+
+```bash
+# プロジェクトIDを設定して実行（YOUR_PROJECT_ID を当日のプロジェクトIDに置き換えてください）
+PROJECT_ID="YOUR_PROJECT_ID"
+
+echo "=== 1. CLI ツールの確認 ==="
+which uv >/dev/null && echo "✅ uv: OK" || echo "❌ uv: 未インストールです"
+which agents-cli >/dev/null && echo "✅ agents-cli: OK ($(agents-cli --version))" || echo "❌ agents-cli: PATH が通っていません (export PATH=\"\$HOME/.local/bin:\$PATH\" を実行してください)"
+
+echo "=== 2. ADC 認証の確認 ==="
+test -f ~/.config/gcloud/application_default_credentials.json && echo "✅ ADC: OK" || echo "❌ ADC: gcloud auth application-default login を実行してください"
+
+echo "=== 3. クラウド接続・権限の確認 ==="
+gcloud ai endpoints list --region=us-east1 --project="$PROJECT_ID" --limit=1 >/dev/null 2>&1 \
+  && echo "✅ Vertex AI 権限: OK" || echo "❌ Vertex AI: aiplatform.googleapis.com 未有効化、または roles/aiplatform.user 権限が不足しています"
+
+gcloud builds list --project="$PROJECT_ID" --limit=1 >/dev/null 2>&1 \
+  && echo "✅ Cloud Build 権限: OK" || echo "❌ Cloud Build: roles/cloudbuild.builds.editor 権限が不足しています"
+```
+
+> [!IMPORTANT]
+> **すべて ✅ OK と表示された画面（または実行ログ）を、前日 17:00 までに講師へご報告ください。**
+
 
 ## B. GCP プロジェクト側の準備（情シス・管理者が実施）
 
