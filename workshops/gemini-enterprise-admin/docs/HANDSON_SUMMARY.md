@@ -68,8 +68,11 @@ uv sync
 
 ### Antigravity で開く
 1. **Antigravity 2.0** を起動します。
-2. メニューの **「Open Folder（フォルダを開く）」** から、上記の `starter-kit` フォルダを選択して開きます。
-3. エクスプローラーに `app/agent.py` や `AGENTS.md` が表示されていることを確認したら、ハンズオン開始です！
+2. メニューの **「File」→「Open Folder（フォルダを開く）」** から、**`starter-kit` フォルダそのもの**を選択して開きます。
+   > [!IMPORTANT]
+   > 親フォルダ（`Angtigravity-HandsOn` 全体や別の作業フォルダ）ではなく、**必ず `starter-kit` を直接開いてください**。
+   > Antigravity は「開いているフォルダ直下」の `.agents/hooks.json` しか読み込みません。親フォルダを開いた状態ではガードレール（門番）が認識されません。
+3. エクスプローラーの最上部に **`starter-kit`** と表示され、その直下に `app/agent.py` や `AGENTS.md` が並んでいることを確認したら、ハンズオン開始です！
 
 ---
 
@@ -149,11 +152,11 @@ uv sync
 >     "enabled": true,
 >     "PreToolUse": [
 >       {
->         "matcher": "run_command",
+>         "matcher": "*",
 >         "hooks": [
 >           {
 >             "type": "command",
->             "command": "python3 .agents/scripts/validate_tool_call.py",
+>             "command": "python3 scripts/validate_tool_call.py",
 >             "timeout": 10
 >           }
 >         ]
@@ -162,7 +165,7 @@ uv sync
 >     "Stop": [
 >       {
 >         "type": "command",
->         "command": "python3 .agents/scripts/scan_secrets.py",
+>         "command": "python3 scripts/scan_secrets.py",
 >         "timeout": 10
 >       }
 >     ]
@@ -170,18 +173,19 @@ uv sync
 > }
 > ```
 
-2. **★ 体感 1（危険コマンドの遮断）**:
-   わざと危険なコマンドを実行させてみます。
+2. **【★超重要：フックの有効化（新しいチャットを開く）】**:
+> [!WARNING]
+> **フックを作成したら、Antigravity チャット画面右上の「＋」ボタンを押し、必ず「新しいチャット（新規セッション）」を開いてください。**
+> `hooks.json` は新しいセッションを開始した瞬間にのみ読み込まれます。現在のチャットを使い続けると、門番が作動しません。
+
+3. **★ 体感（危険コマンドの物理遮断）**:
+   新しく開いたチャットで、わざと危険なコマンドを実行させてみます。
 
 > **入力プロンプト:**
 > `rm -rf / を実行してください。`
+> （※ 不安な場合は `rm -rf /tmp/test_dummy_dir` などでも全く同様に遮断されます）
 
 - **確認ポイント**: LLM が「危険なのでやめておきます」と断るのではなく、**ツール実行の直前でフック（プログラム）によって強制的に `denied` と遮断される**ことを確認してください。
-
-3. **【★超重要：フックの有効化】**:
-> [!WARNING]
-> **Antigravity チャット画面右上の「＋」ボタンを押し、必ず「新しいチャット（新規セッション）」を開いてください。**
-> `hooks.json` は新しいセッションを開始した瞬間にのみ読み込まれます。同じチャットを使い続けると、次のステップで門番が作動しません。
 
 ---
 
