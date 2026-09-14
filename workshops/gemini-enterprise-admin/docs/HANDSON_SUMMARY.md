@@ -43,10 +43,10 @@
 
 ```bash
 # 1. ワークショップ資材のクローン
-git clone https://github.com/cotocn/Angtigravity-HandsOn.git
+git clone https://github.com/cotocn/Antigravity-HandsOn.git
 
 # 2. starter-kit フォルダへ移動し、初期セットアップ
-cd Angtigravity-HandsOn/workshops/gemini-enterprise-admin/starter-kit
+cd Antigravity-HandsOn/workshops/gemini-enterprise-admin/starter-kit
 uv sync
 ```
 
@@ -70,7 +70,7 @@ uv sync
 1. **Antigravity 2.0** を起動します。
 2. メニューの **「File」→「Open Folder（フォルダを開く）」** から、**`starter-kit` フォルダそのもの**を選択して開きます。
    > [!IMPORTANT]
-   > 親フォルダ（`Angtigravity-HandsOn` 全体や別の作業フォルダ）ではなく、**必ず `starter-kit` を直接開いてください**。
+   > 親フォルダ（`Antigravity-HandsOn` 全体や別の作業フォルダ）ではなく、**必ず `starter-kit` を直接開いてください**。
    > Antigravity は「開いているフォルダ直下」の `.agents/hooks.json` しか読み込みません。親フォルダを開いた状態ではガードレール（門番）が認識されません。
 3. エクスプローラーの最上部に **`starter-kit`** と表示され、その直下に `app/agent.py` や `AGENTS.md` が並んでいることを確認したら、ハンズオン開始です！
 
