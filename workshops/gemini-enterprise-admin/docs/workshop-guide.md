@@ -446,32 +446,36 @@ description: コード、PRD、設計書、スライド、Web記事等の論理�
 ### ④ エージェントを見直させる — 20分【本日の山場】
 
 受講者が Antigravity に指示します。
+（※ 最初から「規約に従って直して」と言うと賢い LLM は API キーまで一緒に直してしまうため、まずはプロンプトの指示文の改善だけを依頼し、コード末尾の API キー直書きをあえて残した状態で終了させます）
 
-> プロンプト例: `.agents/AGENTS.md の規約に従って app/agent.py を見直してください。`
+> プロンプト例:
+> ```text
+> app/agent.py の instruction を、社内 IT ヘルプデスクとして推測で答えず一次情報を確認するよう具体的にブラッシュアップしてください。
+> ```
 
 #### ★ 体感 2: Hook が完了を拒否し、エージェントが自己修正する
 
 想定される流れ:
 
 ```
-1. Antigravity が app/agent.py を編集する
+1. Antigravity が app/agent.py の instruction を編集する
        ↓
-2. 「対応しました」と作業を終えようとする
+2. 「指示文を更新しました」と作業を終えようとする
        ↓
-3. ★ Stop フックが発火
+3. ★ Stop フックが発火！
        ↓
-4. scan_secrets.py が app/agent.py に "AIzaSy..." を検出
+4. scan_secrets.py が app/agent.py 内の直書き API キーを検出
        ↓
-5. 「app/agent.py:XX にハードコードされた API キーがあります。
-      環境変数から読み込むよう修正してください。」を返す
+5. 「【ガードレールによる差し戻し】シークレットがソースコードに直書きされています。
+      ITSM_API_KEY = os.environ.get("ITSM_API_KEY", "") に修正してください。」を返す
        ↓
-6. ★ エージェントは終了できない
+6. ★ エージェントは終了を拒否される（強制差し戻し）
        ↓
 7. AGENTS.md の規約 3（是正ループ）に従い、エージェントが自分でエラーを読む
        ↓
-8. api_key=os.environ["GOOGLE_API_KEY"] へ修正
+8. ITSM_API_KEY = os.environ.get("ITSM_API_KEY", "") へ自動で修正
        ↓
-9. 再度終了を試みる → 検査を通過 → 完了
+9. 再度終了を試みる → 検査を通過 → 正常完了！
 ```
 
 > [!IMPORTANT]
