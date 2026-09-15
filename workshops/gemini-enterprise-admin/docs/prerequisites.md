@@ -60,7 +60,33 @@ Cloud Console の **Gemini Enterprise** → **Apps** から、登録先となる
 ### 2-1. Antigravity 2.0 のインストール
 Antigravity を起動し、チャットが応答することを確認してください。
 
-### 2-2. uv のインストール
+### 2-2. Google Cloud SDK (`gcloud` CLI) のインストールと認証
+
+**macOS の場合:**
+```bash
+brew install --cask google-cloud-sdk
+```
+
+**Windows (PowerShell) の場合:**
+```powershell
+# winget でインストール、または Google Cloud SDK 公式インストーラを実行
+winget install Google.CloudSDK
+```
+※ インストール後、PowerShell を一度閉じて開き直してください。
+
+**Linux の場合:**
+公式ドキュメント（[Linux 用 Cloud SDK のインストール](https://cloud.google.com/sdk/docs/install#linux)）に従ってパッケージをインストールしてください。
+
+**認証（全 OS 共通・必須）:**
+```bash
+# 1. Google アカウントへのログイン
+gcloud auth login
+
+# 2. アプリケーション用デフォルト認証 (ADC) の取得
+gcloud auth application-default login
+```
+
+### 2-3. uv のインストール
 
 **macOS / Linux:**
 ```bash
@@ -82,7 +108,7 @@ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | ie
 uv --version
 ```
 
-### 2-3. agents-cli のインストール
+### 2-4. agents-cli のインストール
 
 **macOS / Linux / Windows 共通:**
 ```bash
@@ -104,6 +130,7 @@ agents-cli --version
 PROJECT_ID="YOUR_PROJECT_ID"
 
 echo "=== 1. CLI ツールの確認 ==="
+which gcloud >/dev/null && echo "✅ gcloud: OK" || echo "❌ gcloud: 未インストールです"
 which uv >/dev/null && echo "✅ uv: OK" || echo "❌ uv: 未インストールです"
 which agents-cli >/dev/null && echo "✅ agents-cli: OK ($(agents-cli --version))" || echo "❌ agents-cli: PATH が通っていません (export PATH=\"\$HOME/.local/bin:\$PATH\" を実行してください)"
 
@@ -123,6 +150,7 @@ gcloud builds list --project="$PROJECT_ID" --limit=1 >/dev/null 2>&1 \
 $PROJECT_ID = "YOUR_PROJECT_ID"
 
 Write-Host "=== 1. CLI ツールの確認 ==="
+if (Get-Command gcloud -ErrorAction SilentlyContinue) { Write-Host "✅ gcloud: OK" } else { Write-Host "❌ gcloud: 未インストールです" }
 if (Get-Command uv -ErrorAction SilentlyContinue) { Write-Host "✅ uv: OK" } else { Write-Host "❌ uv: 未インストールです" }
 if (Get-Command agents-cli -ErrorAction SilentlyContinue) { Write-Host "✅ agents-cli: OK ($(agents-cli --version))" } else { Write-Host "❌ agents-cli: コマンドが見つかりません（PowerShell を開き直してください）" }
 
