@@ -1,64 +1,64 @@
-# Coding Agent Guide
+# コーディングエージェント開発ガイド
 
-## Prerequisites
+## 前提条件
 
-Install the CLI (one-time):
+CLI ツールのインストール（初回のみ）:
 ```bash
 uv tool install google-agents-cli
 ```
 
 ---
 
-## Development Phases
+## 開発フェーズ
 
-### Phase 1: Understand Requirements
-Before writing any code, understand the project's requirements, constraints, and success criteria.
+### フェーズ 1: 要件の把握
+コードを書く前に、プロジェクトの要件、制約事項、成功基準を正しく理解してください。
 
-### Phase 2: Build and Implement
-Implement agent logic in `app/`. Use `agents-cli playground` for interactive testing. Iterate based on user feedback.
+### フェーズ 2: 実装とビルド
+`app/` 配下にエージェントのロジックを実装します。対話的な動作確認には `agents-cli playground` を使用し、フィードバックに応じて改善します。
 
-### Phase 3: The Evaluation Loop (Main Iteration Phase)
-Start with 1-2 eval cases, run `agents-cli eval run`, iterate by making changes and rerunning it until satisfied. Expect 5-10+ iterations. Once you have a baseline, reach for `agents-cli eval compare` (regression diffs), `agents-cli eval analyze` (cluster failure modes), and `agents-cli eval optimize` (auto-tune prompts). See the **Evaluation Guide** for metrics, dataset schema, LLM-as-judge config, and common gotchas.
+### フェーズ 3: 評価ループ（主要な改善フェーズ）
+まず 1〜2 件の評価ケースから開始し、`agents-cli eval run` を実行して、満足いく品質になるまで修正と再実行を繰り返します。基準が整ったら、`agents-cli eval compare`（デグレ検知）、`agents-cli eval analyze`（失敗原因のクラスタリング）、`agents-cli eval optimize`（プロンプト自動最適化）を活用してください。
 
-### Phase 4: Pre-Deployment Tests
-Run `uv run pytest tests/unit tests/integration`. Fix issues until all tests pass.
+### フェーズ 4: デプロイ前テスト
+`uv run pytest tests/unit tests/integration` を実行し、すべてのテストがパスするまで修正します。
 
-### Phase 5: Deploy to Dev
-**Requires explicit human approval.** Run `agents-cli deploy` only after user confirms. See the **Deployment Guide** for details.
+### フェーズ 5: 開発環境へのデプロイ
+**人間の明示的な承認が必要です。** ユーザーの確認を取った後でのみ `agents-cli deploy` を実行してください。
 
-### Phase 6: Production Deployment
-Ask the user: Option A (simple single-project) or Option B (full CI/CD pipeline with `agents-cli infra cicd`).
+### フェーズ 6: 本番環境へのデプロイ
+ユーザーに希望の構成を確認します: オプション A（シンプルな単一プロジェクト構成）または オプション B（`agents-cli infra cicd` による完全な CI/CD パイプライン構成）。
 
-## Development Commands
+## 開発用コマンド一覧
 
-| Command | Purpose |
-|---------|---------|
-| `agents-cli playground` | Interactive local testing |
-| `uv run pytest tests/unit tests/integration` | Run unit and integration tests |
-| `agents-cli eval dataset synthesize` | Synthesize multi-turn eval scenarios for your agent |
-| `agents-cli eval run` | Run the agent over the eval dataset and grade the traces |
-| `agents-cli eval generate` / `agents-cli eval grade` | Decoupled form: produce traces, then grade them |
-| `agents-cli eval compare` | Compare two grade-results files (regression check) |
-| `agents-cli eval analyze` | Cluster failure modes from grade results |
-| `agents-cli eval metric list` | List built-in metrics available in the SDK |
-| `agents-cli eval optimize` | Auto-tune agent prompts using eval data |
-| `agents-cli lint` | Check code quality |
-| `agents-cli infra single-project` | Set up project infrastructure (Terraform) |
-| `agents-cli deploy` | Deploy to dev |
-| `agents-cli scaffold enhance` | Add deployment target or CI/CD to project |
-| `agents-cli scaffold upgrade` | Upgrade project to latest version |
+| コマンド | 用途 |
+|---|---|
+| `agents-cli playground` | 対話的なローカル開発・動作確認環境の起動 |
+| `uv run pytest tests/unit tests/integration` | 単体テストおよび統合テストの実行 |
+| `agents-cli eval dataset synthesize` | マルチターン対話の評価シナリオを自動生成 |
+| `agents-cli eval run` | 評価データセットを実行し、対話トレースを採点 |
+| `agents-cli eval generate` / `agents-cli eval grade` | 分離実行: トレースの生成と採点を分けて実行 |
+| `agents-cli eval compare` | 2 つの採点結果ファイルを比較（デグレ検知） |
+| `agents-cli eval analyze` | 採点結果から失敗パターンを自動クラスタリング |
+| `agents-cli eval metric list` | 利用可能な組み込み評価メトリクスの一覧表示 |
+| `agents-cli eval optimize` | 評価データを用いてエージェントの指示文を自動最適化 |
+| `agents-cli lint` | コード品質の静的チェック |
+| `agents-cli infra single-project` | 単一プロジェクトのインフラ構築（Terraform） |
+| `agents-cli deploy` | 開発環境へのデプロイ |
+| `agents-cli scaffold enhance` | デプロイ先や CI/CD 設定をプロジェクトに追加 |
+| `agents-cli scaffold upgrade` | プロジェクトを最新バージョンへ自動アップグレード |
 
 ---
 
-## Operational Guidelines for Coding Agents
+## コーディングエージェントの行動指針
 
-- **Code preservation**: Only modify code directly targeted by the user's request. Preserve all surrounding code, config values (e.g., `model`), comments, and formatting.
-- **NEVER change the model** unless explicitly asked.
-- **Model 404 errors**: Fix `GOOGLE_CLOUD_LOCATION` (e.g., `global` instead of `us-east1`), not the model name.
-- **ADK tool imports**: Import the tool instance, not the module: `from google.adk.tools.load_web_page import load_web_page`
-- **Run Python with `uv`**: `uv run python script.py`. Run `agents-cli install` first.
-- **Stop on repeated errors**: If the same error appears 3+ times, fix the root cause instead of retrying.
-- **Terraform conflicts** (Error 409): Use `terraform import` instead of retrying creation.
+- **コードの保全**: ユーザーの要求に直接関係するコードのみを変更してください。周囲のコード、設定値（`model` など）、コメント、フォーマットは可能な限り保持してください。
+- **モデルを勝手に変更しない**: 明示的な指示がない限り、指定された `model` を変更してはいけません。
+- **モデルの 404 エラー**: モデル名ではなく `GOOGLE_CLOUD_LOCATION`（例: `us-east1` ではなく `global`）を修正してください。
+- **ADK ツールのインポート**: モジュールではなくツールインスタンスをインポートしてください（例: `from google.adk.tools.load_web_page import load_web_page`）。
+- **Python の実行は `uv` を使用**: `uv run python script.py` を使用します。事前に `agents-cli install` を実行してください。
+- **同じエラーの繰り返しを防ぐ**: 同じエラーが 3 回以上続く場合は、闇雲に再試行せず根本原因を特定して修正してください。
+- **Terraform の競合（Error 409）**: 再作成を繰り返すのではなく `terraform import` を使用してください。
 
 ---
 
