@@ -160,8 +160,8 @@ uv sync
    （※ Hooks は厳密な JSON 形式が要求されるため、以下の設定をそのまま渡します）
 
 > **入力プロンプト:**
-> `以下の設定内容で .agents/hooks.json を作成してください。`
-> ```json
+> ```以下の設定内容で .agents/hooks.json を作成してください。
+> json
 > {
 >   "helpdesk-guardrails": {
 >     "enabled": true,
