@@ -1,68 +1,22 @@
-# 【必読】ワークショップ事前準備チェックリスト
+# ワークショップ事前準備チェックリスト
 
-> **開催前日までに必ず完了させ、講師までご報告ください。**
-> 未完了の場合、当日のハンズオン（受入評価やデプロイ）で進行できなくなります。
-
----
-
-## A. 受講者 PC 環境（各自で実施）
-
-### A-1. Antigravity 2.0 のインストール
-アプリを起動し、チャットが正常に応答することを確認してください。
-
-### A-2. uv のインストール
-```bash
-# macOS / Linux
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# PATH の永続化（★必ず実行してください）
-echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
-
-# 確認
-uv --version
-```
-
-### A-3. agents-cli のインストール【最重要】
-```bash
-uv tool install google-agents-cli
-
-# 確認コマンド（★このコマンドが通ることを必ず確認してください）
-agents-cli --version
-```
-
-### A-4. 事前疎通テスト（ワンライナー実行）【必ず実施】
-
-各自の PC 環境および GCP 権限が正しく設定されているかを、以下のコマンドをターミナルに貼り付けて一括検証してください。
-
-```bash
-# プロジェクトIDを設定して実行（YOUR_PROJECT_ID を当日のプロジェクトIDに置き換えてください）
-PROJECT_ID="YOUR_PROJECT_ID"
-
-echo "=== 1. CLI ツールの確認 ==="
-which uv >/dev/null && echo "✅ uv: OK" || echo "❌ uv: 未インストールです"
-which agents-cli >/dev/null && echo "✅ agents-cli: OK ($(agents-cli --version))" || echo "❌ agents-cli: PATH が通っていません (export PATH=\"\$HOME/.local/bin:\$PATH\" を実行してください)"
-
-echo "=== 2. ADC 認証の確認 ==="
-test -f ~/.config/gcloud/application_default_credentials.json && echo "✅ ADC: OK" || echo "❌ ADC: gcloud auth application-default login を実行してください"
-
-echo "=== 3. クラウド接続・権限の確認 ==="
-gcloud ai endpoints list --region=us-east1 --project="$PROJECT_ID" --limit=1 >/dev/null 2>&1 \
-  && echo "✅ Vertex AI 権限: OK" || echo "❌ Vertex AI: aiplatform.googleapis.com 未有効化、または roles/aiplatform.user 権限が不足しています"
-
-gcloud builds list --project="$PROJECT_ID" --limit=1 >/dev/null 2>&1 \
-  && echo "✅ Cloud Build 権限: OK" || echo "❌ Cloud Build: roles/cloudbuild.builds.editor 権限が不足しています"
-```
-
-> [!IMPORTANT]
-> **すべて ✅ OK と表示された画面（または実行ログ）を、前日 17:00 までに講師へご報告ください。**
-> ※ 「❌ ADC」と表示された場合は、指示通り `gcloud auth application-default login` を実行して再試行してください。
+開催前日までに以下の準備を完了してください。
 
 ---
 
-## B. GCP プロジェクト側の準備（情シス・管理者が実施）
+## 1. 【管理者・情シス】GCP 環境の準備
 
-### B-1. 必須 API の有効化
+### 1-1. GCP プロジェクトの選定・準備
+以下のいずれかの方針でプロジェクトを準備してください。
+
+- **パターン 1（推奨）：新規プロジェクトを作成する**
+  - 既存リソースへの影響がなく、ワークショップ終了後にプロジェクトごと削除できるため管理が容易です。
+- **パターン 2：既存の開発・検証用（Sandbox）プロジェクトを利用する**
+  - 受講者にデプロイやビルドの権限を付与するため、本番環境や機密データが存在するプロジェクトは避けてください。
+
+### 1-2. API の有効化
+プロジェクトで必要な API を有効化します。
+
 ```bash
 gcloud services enable \
   aiplatform.googleapis.com \
@@ -72,9 +26,8 @@ gcloud services enable \
   --project=YOUR_PROJECT_ID
 ```
 
-> API 有効化の反映には時間がかかる場合があります。**当日ではなく前日までに**実施してください。
-
-### B-2. 受講者アカウントに付与する IAM ロール
+### 1-3. 受講者アカウントへの IAM ロール付与
+受講者の Google アカウントに以下のロールを付与します。
 
 | ロール | 用途 |
 |---|---|
@@ -92,13 +45,65 @@ gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
 ```
 
 > [!NOTE]
-> 本ワークショップのサンプルエージェントは **外部システムに接続しません**。
-> FAQ 検索もチケット照会もコード内のダミーデータを返すだけなので、
-> BigQuery などデータストア側の権限は一切不要です。
+> サンプルエージェントは外部システムに接続せず、コード内のダミーデータを返すため、BigQuery などのデータストア権限は不要です。
+
+### 1-4. Gemini Enterprise App の作成
+Cloud Console の **Gemini Enterprise** → **Apps** から、登録先となるアプリを事前に 1 つ作成してください。
+
+### 1-5. 受講者への案内
+準備完了後、受講者に **GCP プロジェクト ID** を共有してください。
 
 ---
 
-## C. Gemini Enterprise 側の準備（管理者が実施）
+## 2. 【受講者】PC 環境のセットアップ
 
-### C-1. Gemini Enterprise App の作成
-Cloud Console → **Gemini Enterprise** → **Apps** から、登録先となるアプリを事前に 1 つ作成しておいてください。
+### 2-1. Antigravity 2.0 のインストール
+Antigravity を起動し、チャットが応答することを確認してください。
+
+### 2-2. uv のインストール
+```bash
+# macOS / Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# PATH の設定
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+
+# 確認
+uv --version
+```
+
+### 2-3. agents-cli のインストール
+```bash
+uv tool install google-agents-cli
+
+# 確認
+agents-cli --version
+```
+
+---
+
+## 3. 【受講者】事前疎通テスト
+
+管理者から共有された `PROJECT_ID` を設定し、以下のコマンドをターミナルで実行してください。
+
+```bash
+PROJECT_ID="YOUR_PROJECT_ID"
+
+echo "=== 1. CLI ツールの確認 ==="
+which uv >/dev/null && echo "✅ uv: OK" || echo "❌ uv: 未インストールです"
+which agents-cli >/dev/null && echo "✅ agents-cli: OK ($(agents-cli --version))" || echo "❌ agents-cli: PATH が通っていません (export PATH=\"\$HOME/.local/bin:\$PATH\" を実行してください)"
+
+echo "=== 2. ADC 認証の確認 ==="
+test -f ~/.config/gcloud/application_default_credentials.json && echo "✅ ADC: OK" || echo "❌ ADC: gcloud auth application-default login を実行してください"
+
+echo "=== 3. クラウド接続・権限の確認 ==="
+gcloud ai endpoints list --region=us-east1 --project="$PROJECT_ID" --limit=1 >/dev/null 2>&1 \
+  && echo "✅ Vertex AI 権限: OK" || echo "❌ Vertex AI: aiplatform.googleapis.com 未有効化、または roles/aiplatform.user 権限が不足しています"
+
+gcloud builds list --project="$PROJECT_ID" --limit=1 >/dev/null 2>&1 \
+  && echo "✅ Cloud Build 権限: OK" || echo "❌ Cloud Build: roles/cloudbuild.builds.editor 権限が不足しています"
+```
+
+すべて ✅ OK と表示された実行ログ（または画面キャプチャ）を講師までご報告ください。
+※ 「❌ ADC」と表示された場合は、`gcloud auth application-default login` を実行して再試行してください。
