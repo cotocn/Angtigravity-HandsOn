@@ -10,14 +10,7 @@
 ### A-1. Antigravity 2.0 のインストール
 アプリを起動し、チャットが正常に応答することを確認してください。
 
-### A-2. Google Cloud CLI の認証
-```bash
-gcloud auth application-default login
-gcloud config set project YOUR_PROJECT_ID
-gcloud config list
-```
-
-### A-3. uv のインストール
+### A-2. uv のインストール
 ```bash
 # macOS / Linux
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -30,7 +23,7 @@ source ~/.bashrc
 uv --version
 ```
 
-### A-4. agents-cli のインストール【最重要】
+### A-3. agents-cli のインストール【最重要】
 ```bash
 uv tool install google-agents-cli
 
@@ -38,9 +31,7 @@ uv tool install google-agents-cli
 agents-cli --version
 ```
 
----
-
-### A-5. 事前疎通テスト（ワンライナー実行）【必ず実施】
+### A-4. 事前疎通テスト（ワンライナー実行）【必ず実施】
 
 各自の PC 環境および GCP 権限が正しく設定されているかを、以下のコマンドをターミナルに貼り付けて一括検証してください。
 
@@ -65,6 +56,7 @@ gcloud builds list --project="$PROJECT_ID" --limit=1 >/dev/null 2>&1 \
 
 > [!IMPORTANT]
 > **すべて ✅ OK と表示された画面（または実行ログ）を、前日 17:00 までに講師へご報告ください。**
+> ※ 「❌ ADC」と表示された場合は、指示通り `gcloud auth application-default login` を実行して再試行してください。
 
 ---
 
@@ -104,25 +96,9 @@ gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
 > FAQ 検索もチケット照会もコード内のダミーデータを返すだけなので、
 > BigQuery などデータストア側の権限は一切不要です。
 
-### B-3. Gemini モデルの疎通確認【必ず実施】
-
-前日までに、受講者アカウント（もしくは同等の権限）で以下が通ることを確認してください。
-
-```bash
-gcloud ai endpoints list --region=us-east1 --project=YOUR_PROJECT_ID >/dev/null \
-  && echo "aiplatform への疎通 OK"
-```
-
 ---
 
 ## C. Gemini Enterprise 側の準備（管理者が実施）
 
 ### C-1. Gemini Enterprise App の作成
-Cloud Console → **Gemini Enterprise** → **Apps** から、登録先となるアプリを事前に作成してください。
-
-### C-2. App ID の控え
-以下の形式のフルリソース名を控えておいてください（当日の公開ステップで受講者に共有するか、プロジェクト内アプリとして参照します）。
-
-```
-projects/<PROJECT_NUMBER>/locations/global/collections/default_collection/engines/<APP_ID>
-```
+Cloud Console → **Gemini Enterprise** → **Apps** から、登録先となるアプリを事前に 1 つ作成しておいてください。
