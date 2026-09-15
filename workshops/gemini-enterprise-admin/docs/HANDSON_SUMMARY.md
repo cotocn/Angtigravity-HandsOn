@@ -245,12 +245,13 @@ uv sync
    agents-cli deploy --status
    ```
 2. Gemini Enterprise にエージェントを登録（全社公開）します。
+   ※ 他の受講者と区別できるよう、表示名に「自分の名前」を含めて実行してください。
    ```bash
    agents-cli publish gemini-enterprise \
-     --display-name "社内 IT ヘルプデスク・アシスタント" \
+     --display-name "社内 IT ヘルプデスク・アシスタント (あなたの名前)" \
      --description "全社認定済み：ITヘルプデスク問い合わせ対応AI"
    ```
-3. ブラウザで Gemini Enterprise の画面を開き、エージェント一覧に「社内 IT ヘルプデスク・アシスタント」が並んでいることを確認してゴールです！
+3. ブラウザで Gemini Enterprise の画面を開き、エージェント一覧に自分の名前が付いた「社内 IT ヘルプデスク・アシスタント (あなたの名前)」が並んでいることを確認してゴールです！
 
 ---
 

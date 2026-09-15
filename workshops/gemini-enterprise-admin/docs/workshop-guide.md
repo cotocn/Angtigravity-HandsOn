@@ -521,12 +521,13 @@ agents-cli eval run \
 agents-cli deploy --status
 
 # Gemini Enterprise への登録（＝全社公開）
+# ※ 複数受講者のアプリ混同を防ぐため、表示名に受講者名を含めます。
 agents-cli publish gemini-enterprise \
-  --display-name "社内 IT ヘルプデスク・アシスタント" \
+  --display-name "社内 IT ヘルプデスク・アシスタント (受講者名)" \
   --description "社内 IT の問い合わせ対応を支援する全社認定AIアシスタント"
 ```
 
-- ブラウザで Gemini Enterprise を開き、カタログに登録されたエージェントと対話します。
+- ブラウザで Gemini Enterprise を開き、カタログに登録された自分のエージェント（名前付き）と対話します。
 - **カタログへの反映には数分のラグが生じます。** その間は第3部の講義を進めてください。
 
 > [!TIP]
