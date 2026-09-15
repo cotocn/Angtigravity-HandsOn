@@ -61,8 +61,9 @@ Cloud Console の **Gemini Enterprise** → **Apps** から、登録先となる
 Antigravity を起動し、チャットが応答することを確認してください。
 
 ### 2-2. uv のインストール
+
+**macOS / Linux:**
 ```bash
-# macOS / Linux
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # PATH の設定
@@ -73,20 +74,32 @@ source ~/.bashrc
 uv --version
 ```
 
+**Windows (PowerShell):**
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# 確認（PowerShell を再起動するか、新しいウィンドウを開いて実行）
+uv --version
+```
+
 ### 2-3. agents-cli のインストール
+
+**macOS / Linux / Windows 共通:**
 ```bash
 uv tool install google-agents-cli
 
 # 確認
 agents-cli --version
 ```
+※ Windows で `agents-cli` コマンドが見つからない場合は、PowerShell を一度閉じて開き直してください。
 
 ---
 
 ## 3. 【受講者】事前疎通テスト
 
-管理者から共有された `PROJECT_ID` を設定し、以下のコマンドをターミナルで実行してください。
+管理者から共有された `PROJECT_ID` を設定し、以下の確認コマンドを実行してください。
 
+### macOS / Linux の場合:
 ```bash
 PROJECT_ID="YOUR_PROJECT_ID"
 
@@ -103,6 +116,26 @@ gcloud ai endpoints list --region=us-east1 --project="$PROJECT_ID" --limit=1 >/d
 
 gcloud builds list --project="$PROJECT_ID" --limit=1 >/dev/null 2>&1 \
   && echo "✅ Cloud Build 権限: OK" || echo "❌ Cloud Build: roles/cloudbuild.builds.editor 権限が不足しています"
+```
+
+### Windows (PowerShell) の場合:
+```powershell
+$PROJECT_ID = "YOUR_PROJECT_ID"
+
+Write-Host "=== 1. CLI ツールの確認 ==="
+if (Get-Command uv -ErrorAction SilentlyContinue) { Write-Host "✅ uv: OK" } else { Write-Host "❌ uv: 未インストールです" }
+if (Get-Command agents-cli -ErrorAction SilentlyContinue) { Write-Host "✅ agents-cli: OK ($(agents-cli --version))" } else { Write-Host "❌ agents-cli: コマンドが見つかりません（PowerShell を開き直してください）" }
+
+Write-Host "=== 2. ADC 認証の確認 ==="
+$adcPath = "$env:APPDATA\gcloud\application_default_credentials.json"
+if (Test-Path $adcPath) { Write-Host "✅ ADC: OK" } else { Write-Host "❌ ADC: gcloud auth application-default login を実行してください" }
+
+Write-Host "=== 3. クラウド接続・権限の確認 ==="
+gcloud ai endpoints list --region=us-east1 --project="$PROJECT_ID" --limit=1 2>$null
+if ($LASTEXITCODE -eq 0) { Write-Host "✅ Vertex AI 権限: OK" } else { Write-Host "❌ Vertex AI: 権限不足または API 未有効化" }
+
+gcloud builds list --project="$PROJECT_ID" --limit=1 2>$null
+if ($LASTEXITCODE -eq 0) { Write-Host "✅ Cloud Build 権限: OK" } else { Write-Host "❌ Cloud Build: 権限不足" }
 ```
 
 すべて ✅ OK と表示されるかご確認ください。
