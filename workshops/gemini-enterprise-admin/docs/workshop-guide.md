@@ -394,33 +394,41 @@ description: コード、PRD、設計書、スライド、Web記事等の論理�
 
 ```json
 {
-  "enabled": true,
-  "PreToolUse": [
-    {
-      "matcher": "run_command",
-      "command": "python3 .agents/scripts/validate_tool_call.py",
-      "timeout": 10
-    }
-  ],
-  "Stop": [
-    {
-      "command": "python3 .agents/scripts/scan_secrets.py",
-      "timeout": 10
-    }
-  ]
+  "helpdesk-guardrails": {
+    "enabled": true,
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 scripts/validate_tool_call.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "python3 scripts/scan_secrets.py",
+        "timeout": 10
+      }
+    ]
+  }
 }
 ```
 
 > [!CAUTION]
-> **`PreToolUse` には `matcher` フィールドが必須です。**
-> 省略・誤設定すると、エージェントが生のシェルコマンドを無検査で実行できてしまいます。
+> **`hooks.json` の構造に注意:**
+> 最新の Antigravity 仕様では、各名前空間配下に `matcher` および `hooks: [{"type": "command", ...}]` の配列構造が必要です。
 
 **配布スクリプトの中身を読ませる（書かせない）**:
 
 | スクリプト | やっていること |
 |---|---|
-| `validate_tool_call.py` | 実行しようとしているコマンドを標準入力から受け取り、`rm -rf /` などが含まれていたら**拒否**する |
-| `scan_secrets.py` | ソースコードを走査し、`AIzaSy` で始まる文字列を見つけたら**エージェントの終了を拒否**する |
+| `scripts/validate_tool_call.py` | Antigravity がコマンドを実行する直前に呼び出され、`rm -rf /`、`mkfs`、`:(){`（フォーク爆弾）などの危険操作が含まれていたら `{"decision": "deny"}` を返し**実行そのものを未然に遮断**する |
+| `scripts/scan_secrets.py` | エージェントが作業を完了・終了しようとした瞬間に `app/` を走査し、変数への秘密情報（API キー・トークン等）の直書きを検知したら `{"decision": "continue"}` を返し**終了を拒否して自己修正を促す** |
 
 #### ★ 体感 1: 危険コマンドが弾かれる
 
