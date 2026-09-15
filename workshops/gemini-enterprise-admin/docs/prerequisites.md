@@ -105,5 +105,5 @@ gcloud builds list --project="$PROJECT_ID" --limit=1 >/dev/null 2>&1 \
   && echo "✅ Cloud Build 権限: OK" || echo "❌ Cloud Build: roles/cloudbuild.builds.editor 権限が不足しています"
 ```
 
-すべて ✅ OK と表示された実行ログ（または画面キャプチャ）を講師までご報告ください。
+すべて ✅ OK と表示されるかご確認ください。
 ※ 「❌ ADC」と表示された場合は、`gcloud auth application-default login` を実行して再試行してください。
