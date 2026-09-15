@@ -120,25 +120,9 @@ gcloud ai endpoints list --region=us-east1 --project=YOUR_PROJECT_ID >/dev/null 
 ### C-1. Gemini Enterprise App の作成
 Cloud Console → **Gemini Enterprise** → **Apps** から、登録先となるアプリを事前に作成してください。
 
-### C-2. App ID の控えと受講者への配布
-以下の形式のフルリソース名を控え、受講者に配布します。
+### C-2. App ID の控え
+以下の形式のフルリソース名を控えておいてください（当日の公開ステップで受講者に共有するか、プロジェクト内アプリとして参照します）。
 
 ```
 projects/<PROJECT_NUMBER>/locations/global/collections/default_collection/engines/<APP_ID>
 ```
-
-### C-3. 受講者側での環境変数設定
-```bash
-export GEMINI_ENTERPRISE_APP_ID="projects/.../engines/your-app"
-```
-
----
-
-## D. 講師側の当日リスク対策
-
-| リスク | 対策 |
-|---|---|
-| **クォータ枯渇** | 同時デプロイが集中する場合は 2 バッチに分割、または受講者ごとにプロジェクトを分離 |
-| **デプロイ長時間化** | `--no-wait` による非同期デプロイを徹底し、待ち時間中に Eval を実施 |
-| **脱落者の発生** | 完成済みプロジェクトを講師が画面共有し、詰まった受講者も流れを追えるようにする |
-| **カタログ反映ラグ** | Gemini Enterprise への反映待ち時間に第3部の講義を先行開始できるよう進行を調整 |
